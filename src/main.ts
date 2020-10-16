@@ -1,8 +1,18 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import * as rateLimit from 'express-rate-limit';
+import { BlablaCutAppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+  const app = await NestFactory.create(BlablaCutAppModule, {
+    cors: true,
+    logger: ['error', 'warn'],
+  });
+  app.use(
+    rateLimit({
+      windowMs: 10 * 60_1000,
+      max: 20,
+    }),
+  );
+  await app.listen(7777);
 }
 bootstrap();
