@@ -2,6 +2,7 @@ import {
   Res,
   Body,
   Post,
+  Logger,
   UsePipes,
   Controller,
   HttpStatus,
@@ -25,22 +26,22 @@ export class CutController {
     @Res() res: Response,
   ): Promise<void> {
     try {
-      let cutResult: CutResult;
+      let cutResult: string;
       const mlProcess = this.service.cut(
         req.videoUrl,
         req.filterType,
         req.filter,
       );
       mlProcess.stdout.on('data', chunk => {
-        cutResult = JSON.parse(chunk.toString());
+        cutResult = chunk.toString();
+        Logger.log(`CutResult: ${cutResult}`);
       });
       mlProcess.stderr.on('data', error => {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(error);
       });
       mlProcess.on('close', code => {
-        console.log(`ml process exited with code: ${code}`);
         if (code === 0) {
-          const { status, data } = cutResult;
+          const { status, data } = JSON.parse(cutResult) as CutResult;
           if (status === CutResultStatus.SUCCESS) {
             const result = new CutResponse(data);
             res.status(HttpStatus.OK).json(result);
@@ -48,15 +49,17 @@ export class CutController {
             res.status(HttpStatus.NOT_FOUND).json({ status });
           }
         } else {
-          res.status(HttpStatus.INTERNAL_SERVER_ERROR);
+          Logger.warn(`ML process exited with code: ${code}`);
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(code);
         }
       });
       mlProcess.on('error', error => {
-        console.log(`ml process error: ${error.message}`);
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR);
+        Logger.error(`ML process error: ${error.message}`, error.stack);
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
       });
     } catch (e) {
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR);
+      Logger.error(`INTERNAL_SERVER_ERROR: ${e.message}`, e.stack);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(e.message);
     }
   }
 }
