@@ -38,7 +38,7 @@ export class CutController {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(error);
       });
       mlProcess.on('close', code => {
-        console.log(`child process exited with code: ${code}`);
+        console.log(`ml process exited with code: ${code}`);
         const { status, data } = cutResult;
         if (status === CutResultStatus.SUCCESS) {
           const result = new CutResponse(data);
@@ -46,6 +46,10 @@ export class CutController {
         } else {
           res.status(HttpStatus.NOT_FOUND).json({ status });
         }
+      });
+      mlProcess.on('error', error => {
+        console.log(`ml process error: ${error.message}`);
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR);
       });
     } catch (e) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR);
