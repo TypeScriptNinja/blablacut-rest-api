@@ -13,6 +13,6 @@ async function bootstrap() {
       max: 20,
     }),
   );
-  await app.listen(7777);
+  await app.listen(3000);
 }
 bootstrap();
