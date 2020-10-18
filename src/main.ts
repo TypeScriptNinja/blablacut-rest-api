@@ -4,7 +4,7 @@ import { BlablaCutAppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(BlablaCutAppModule, {
-    cors: true,
+    // cors: true,
     logger: ['error', 'warn'],
   });
   app.use(

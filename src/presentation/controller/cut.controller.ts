@@ -39,12 +39,16 @@ export class CutController {
       });
       mlProcess.on('close', code => {
         console.log(`ml process exited with code: ${code}`);
-        const { status, data } = cutResult;
-        if (status === CutResultStatus.SUCCESS) {
-          const result = new CutResponse(data);
-          res.status(HttpStatus.OK).json(result);
+        if (code === 0) {
+          const { status, data } = cutResult;
+          if (status === CutResultStatus.SUCCESS) {
+            const result = new CutResponse(data);
+            res.status(HttpStatus.OK).json(result);
+          } else {
+            res.status(HttpStatus.NOT_FOUND).json({ status });
+          }
         } else {
-          res.status(HttpStatus.NOT_FOUND).json({ status });
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR);
         }
       });
       mlProcess.on('error', error => {
