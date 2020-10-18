@@ -8,6 +8,8 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { CutResult } from 'src/domain/value-object/CutResult';
+import { CutResultStatus } from 'src/domain/enum/CutResultStatus';
 import { CutService } from 'src/application/cut.service';
 import { CutRequest } from 'src/presentation/request/Cut';
 import { CutResponse } from 'src/presentation/response/Cut';
@@ -23,22 +25,27 @@ export class CutController {
     @Res() res: Response,
   ): Promise<void> {
     try {
-      let cutVideoSrc: string;
+      let cutResult: CutResult;
       const mlProcess = this.service.cut(
         req.videoUrl,
         req.filterType,
         req.filter,
       );
       mlProcess.stdout.on('data', chunk => {
-        cutVideoSrc = chunk.toString();
+        cutResult = JSON.parse(chunk.toString());
       });
       mlProcess.stderr.on('data', error => {
         res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(error);
       });
       mlProcess.on('close', code => {
         console.log(`child process exited with code: ${code}`);
-        const result = new CutResponse(cutVideoSrc);
-        res.status(HttpStatus.OK).json(result);
+        const { status, data } = cutResult;
+        if (status === CutResultStatus.SUCCESS) {
+          const result = new CutResponse(data);
+          res.status(HttpStatus.OK).json(result);
+        } else {
+          res.status(HttpStatus.NOT_FOUND).json({ status });
+        }
       });
     } catch (e) {
       res.status(HttpStatus.INTERNAL_SERVER_ERROR);
