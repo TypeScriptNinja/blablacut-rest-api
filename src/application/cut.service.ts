@@ -10,7 +10,7 @@ export class CutService {
     return new Promise<CutResult>(function(resolve, reject) {
       let cutResult: CutResult;
 
-      const shellPath = resolvePath(
+      const command = resolvePath(
         __dirname,
         `../${process.env.bbc_python_path}`,
       );
@@ -19,8 +19,8 @@ export class CutService {
         `../${process.env.bbc_video_cutter_path}/web_cutter`,
       );
 
-      Logger.debug(`ShellPath: ${shellPath}`);
-      Logger.debug(`cwd: ${cwd}`);
+      Logger.debug(`child_process command: ${command}`);
+      Logger.debug(`child_process cwd: ${cwd}`);
 
       const cb = (code: number): void =>
         code !== 0
@@ -28,8 +28,8 @@ export class CutService {
           : resolve(cutResult);
 
       const mlProcess = spawn(
-        shellPath,
-        [`/cut.py`, videoUrl, filterType, filter],
+        command,
+        ['cut.py', videoUrl, filterType, filter],
         { cwd },
       );
 

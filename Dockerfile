@@ -2,7 +2,7 @@ FROM node:buster
 WORKDIR /app
 
 RUN apt update -y &&\
-    apt install -y lsb-release libsndfile1 && \
+    apt install -y lsb-release libsndfile1 ffmpeg gpac && \
     wget https://people.debian.org/~paravoid/python-all/unofficial-python-all.asc && \
     mv unofficial-python-all.asc /etc/apt/trusted.gpg.d/ && \
     echo "deb http://people.debian.org/~paravoid/python-all $(lsb_release -sc) main" > /etc/apt/sources.list.d/python-all.list && \
