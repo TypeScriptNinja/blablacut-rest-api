@@ -14,25 +14,24 @@ export class CutService {
         __dirname,
         `../${process.env.bbc_python_path}`,
       );
-      const scriptPath = resolvePath(
+      const cwd = resolvePath(
         __dirname,
-        `../${process.env.bbc_video_cutter_path}/web_cutter/cut.py`,
+        `../${process.env.bbc_video_cutter_path}/web_cutter`,
       );
 
       Logger.debug(`ShellPath: ${shellPath}`);
-      Logger.debug(`ScriptPath: ${scriptPath}`);
+      Logger.debug(`cwd: ${cwd}`);
 
       const cb = (code: number): void =>
         code !== 0
           ? reject(new Error(`ML process exit with ${code} code.`))
           : resolve(cutResult);
 
-      const mlProcess = spawn(shellPath, [
-        scriptPath,
-        videoUrl,
-        filterType,
-        filter,
-      ]);
+      const mlProcess = spawn(
+        shellPath,
+        [`${cwd}/cut.py`, videoUrl, filterType, filter],
+        { cwd },
+      );
 
       mlProcess.stderr.on('data', e => reject(e.toString()));
       mlProcess.stdout.on('data', chunk => {
