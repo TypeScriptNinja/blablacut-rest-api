@@ -36,9 +36,10 @@ export class CutController {
       } else {
         res.status(HttpStatus.NOT_FOUND).json({ status });
       }
-    } catch ({ message, stack }) {
-      Logger.error(`INTERNAL_SERVER_ERROR: ${message}`, stack);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message });
+    } catch (e) {
+      const msg = e.message ?? e;
+      Logger.error(`INTERNAL_SERVER_ERROR: ${msg}`, e.stack);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ msg });
     }
   }
 }

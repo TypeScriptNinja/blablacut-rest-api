@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 import { resolve as resolvePath } from 'path';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { FilterType } from 'src/domain/enum/FilterType';
 import { CutResult } from 'src/domain/value-object/CutResult';
 
@@ -10,26 +10,33 @@ export class CutService {
     return new Promise<CutResult>(function(resolve, reject) {
       let cutResult: CutResult;
 
+      const shellPath = resolvePath(
+        __dirname,
+        `../${process.env.bbc_python_path}`,
+      );
+      const scriptPath = resolvePath(
+        __dirname,
+        `../${process.env.bbc_video_cutter_path}/web_cutter/cut.py`,
+      );
+
+      Logger.debug(`ShellPath: ${shellPath}`);
+      Logger.debug(`ScriptPath: ${scriptPath}`);
+
       const cb = (code: number): void =>
         code !== 0
           ? reject(new Error(`ML process exit with ${code} code.`))
           : resolve(cutResult);
 
-      const mlProcess = spawn(
-        resolvePath(__dirname, `../${process.env.bbc_python_path}`),
-        [
-          resolvePath(
-            __dirname,
-            `../${process.env.bbc_video_cutter_path}/web_cutter/cut.py`,
-          ),
-          videoUrl,
-          filterType,
-          filter,
-        ],
-      );
+      const mlProcess = spawn(shellPath, [
+        scriptPath,
+        videoUrl,
+        filterType,
+        filter,
+      ]);
 
       mlProcess.stderr.on('data', e => reject(e.toString()));
       mlProcess.stdout.on('data', chunk => {
+        Logger.debug(`stdout: ${chunk.toString()}`);
         cutResult = JSON.parse(chunk.toString());
       });
       mlProcess.on('exit', cb);
