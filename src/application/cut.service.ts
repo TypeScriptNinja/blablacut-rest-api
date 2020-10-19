@@ -19,9 +19,6 @@ export class CutService {
         `../${process.env.bbc_video_cutter_path}/web_cutter`,
       );
 
-      Logger.debug(`child_process command: ${command}`);
-      Logger.debug(`child_process cwd: ${cwd}`);
-
       const cb = (code: number): void =>
         code !== 0
           ? reject(new Error(`ML process exit with ${code} code.`))
