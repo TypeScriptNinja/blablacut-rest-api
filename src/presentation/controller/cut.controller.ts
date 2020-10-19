@@ -50,16 +50,16 @@ export class CutController {
           }
         } else {
           Logger.warn(`ML process exited with code: ${code}`);
-          res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(code);
+          res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ code });
         }
       });
-      mlProcess.on('error', error => {
-        Logger.error(`ML process error: ${error.message}`, error.stack);
-        res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
+      mlProcess.on('error', ({ message, stack }) => {
+        Logger.error(`ML process error: ${message}`, stack);
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message });
       });
-    } catch (e) {
-      Logger.error(`INTERNAL_SERVER_ERROR: ${e.message}`, e.stack);
-      res.status(HttpStatus.INTERNAL_SERVER_ERROR).send(e.message);
+    } catch ({ message, stack }) {
+      Logger.error(`INTERNAL_SERVER_ERROR: ${message}`, stack);
+      res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message });
     }
   }
 }
