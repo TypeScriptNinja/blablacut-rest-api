@@ -10,8 +10,11 @@ export class CutService {
     filterType: FilterType,
     filter: string,
   ): ChildProcessWithoutNullStreams {
-    return spawn('python', [
-      resolve(__dirname, '../video_cutter/web_cutter/cut.py'),
+    return spawn(process.env.python_path, [
+      resolve(
+        __dirname,
+        `../${process.env.video_cutter_path}/web_cutter/cut.py`,
+      ),
       videoUrl,
       filterType,
       filter,
