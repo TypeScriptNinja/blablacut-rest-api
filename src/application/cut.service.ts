@@ -29,7 +29,7 @@ export class CutService {
 
       const mlProcess = spawn(
         shellPath,
-        [`${cwd}/cut.py`, videoUrl, filterType, filter],
+        [`/cut.py`, videoUrl, filterType, filter],
         { cwd },
       );
 
