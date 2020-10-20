@@ -25,6 +25,7 @@ export class CutController {
     @Res() res: Response,
   ): Promise<void> {
     try {
+      Logger.debug(req);
       const result = await this.service.cut(
         req.videoUrl,
         req.filterType,
