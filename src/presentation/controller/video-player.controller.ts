@@ -7,7 +7,7 @@ import { Res, Req, Get, Controller, Logger, HttpStatus } from '@nestjs/common';
 export class VideoPlayerController {
   private static DIR: string = resolve(
     __dirname,
-    `../../video_cutter/web_cutter/player`,
+    `../../${process.env.bbc_video_cutter_path}/web_cutter/player`,
   );
 
   @Get('*')
@@ -17,6 +17,7 @@ export class VideoPlayerController {
       const i = url.lastIndexOf('/');
       const path = VideoPlayerController.DIR + url.substring(i);
       const { size } = statSync(path);
+      Logger.debug(`video size: ${size} in ${path}`);
       const range = headers.range;
       if (range) {
         const parts = range.replace(/bytes=/, '').split('-');
