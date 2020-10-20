@@ -17,7 +17,6 @@ export class VideoPlayerController {
       const i = url.lastIndexOf('/');
       const path = VideoPlayerController.DIR + url.substring(i);
       const { size } = statSync(path);
-      Logger.debug(`video size: ${size} in ${path}`);
       const range = headers.range;
       if (range) {
         const parts = range.replace(/bytes=/, '').split('-');
